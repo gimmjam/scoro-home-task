@@ -5,9 +5,9 @@ Details are given inside /cluster/cluster-creation.txt
 
 # Task2:
 yaml files are located inside /templates/..
-First setup Helm and Kubernetes 
+First setup Helm and Kubernetes
 
-Download Helm:
+Download Helm:  
 $ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 
 Make the script executable:  
