@@ -1,0 +1,86 @@
+Setup Kubernetes on Amazon EKS
+
+I prefer eksctl to setup Kubernetes cluster on Amazon EKS.
+
+
+Pre-requisites:
+
+* An EC2 Instance : I choose EC2 instance to use as a bootstrap image. 
+
+                    Create a new security group where port number 22 is open for connections.
+
+* Install AWSCLI latest verison  : Above EC2 instance is going to communicate with EKS service through AWSCLI.
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+
+STEPS
+-----
+
+1. Setup kubectl  : Kubectl is a command line tool that we use to communicate with the Kubernetes API server
+
+(a) Download kubectl V-1.29 
+
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.29.0/2024-01-04/bin/linux/amd64/kubectl
+
+(b) Grant execution permissions to kubectl executable 
+
+chmod +x ./kubectl
+
+(c) mv ./kubectl /usr/local/bin 
+
+(d) Check kubectl installation successful or not
+
+kubectl version --short --client 
+
+Client Version: v1.29.0-eks-5e0fdde
+
+2. Setup eksctl
+
+(a) Download and extract latest release
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+(b) Move the extracted binary to /usr/local/bin
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+(c) Test that your eksclt installation was successful
+
+eksctl version
+
+0.171.0
+
+3. Create an IAM Role and attach it to the EC2 instance : EC2 instance--->Security---->Modifyrule---->Choose the IAM role
+
+IAM role should have access to
+IAM
+EC2
+CloudFormation
+
+4. Create cluster and nodes
+
+eksctl create cluster --name scoro  \
+--region eu-west-2 \
+--node-type t2.small \
+--nodes-min 2 \
+--nodes-max 2 \ 
+
+Wait for 20-25 minutes for the cluster to be ready.
+
+5. Validate the cluster by creating a pod (httpd) and checking the nodes
+
+kubectl run webapp --image=httpd
+
+kubectl get nodes
+
+kubectl get pods
+
+
+6. Since EKS cluster is using different services which are chargeable in AWS, I have deleted the cluster after my testing.
+
+To delete the EKS cluster :
+
+eksctl delete cluster scoro --region eu-west-2
